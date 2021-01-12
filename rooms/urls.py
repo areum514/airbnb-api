@@ -4,5 +4,5 @@ from django.urls import path
 app_name = "rooms"
 
 
-urlpatterns = [path("list",views.rooms_view),
+urlpatterns = [path("",views.RoomView.as_view()),
 path("<int:pk>/",views.SeeRoomView.as_view())]

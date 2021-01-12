@@ -6,7 +6,7 @@ class ReadRoomSerializer(serializers.ModelSerializer):
     user=UserSerializer()
     class Meta:
         model=Room
-        exclude=("modified")
+        exclude=(["modified"])
     
 
 class WirteRoomSerializer(serializers.Serializer):
@@ -22,5 +22,17 @@ class WirteRoomSerializer(serializers.Serializer):
     check_out = serializers.TimeField(default="00:00:00")
     instant_book = serializers.BooleanField(default=False)
 
-     def create(self, validated_data):
+    def create(self, validated_data):
+        return Room.objects.create(**validated_data)
+    
+    def validate(self, data):
+        if not self.instance:
+            check_in = data.get("check_in")
+            check_out = data.get("check_out")
+            if check_in == check_out:
+                raise serializers.ValidationError("Not enough time between changes")
+            
+        return data
+        
+    def update(self, instance, validated_data):
         return Room.objects.create(**validated_data)
