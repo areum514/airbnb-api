@@ -7,7 +7,7 @@ from .serializers import ReadRoomSerializer, WirteRoomSerializer
 # Create your views here.
 
 
-class RoomView(APIView):
+class RoomsView(APIView):
     def get(self,request):
         rooms = Room.objects.all()
         serializer = ReadRoomSerializer(rooms, many=True).data
@@ -23,7 +23,7 @@ class RoomView(APIView):
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class SeeRoomView(APIView):
+class RoomView(APIView):
     def get_data(self,pk):
         try:
             room = Room.objects.get(pk=pk)
@@ -46,7 +46,8 @@ class SeeRoomView(APIView):
                 return Response(status=status.HTTP_403_FORBIDDEN)
             serializer = WriteRoomSerializer(room, data=request.data, partial=True)
             if serializer.is_valid():
-                serializer.save()
+                room = serializer.save()
+                return Response(ReadRoomSerializer(room).data)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response()
