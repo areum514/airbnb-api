@@ -1,3 +1,6 @@
+import jwt
+from django.conf import settings
+from django.contrib.auth import authenticate
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
@@ -8,6 +11,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rooms.serializers import RoomSerializer
 from rooms.models import Room
+
 # Create your views here.
 
 class UsersView(APIView):
@@ -62,3 +66,16 @@ def user_detail(request,pk):
         return Response(UserSerializer(request.user).data)
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def login(request):
+    username=request.data.get('username')
+    password=request.data.get('password')
+    if not username or not password:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    user=authenticate(username=username,password=password)
+    if user is not None:
+        encoded_jwt = jwt.encode({"id": user.pk}, settings.SECRET_KEY, algorithm="HS256")
+
+
