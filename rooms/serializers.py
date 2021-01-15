@@ -7,7 +7,7 @@ class RoomSerializer(serializers.ModelSerializer):
     user=RelatedUserSerializer()
     class Meta:
         model=Room
-        exclude = ( "modified")
+        exclude = ( ["modified"])
         read_only_fields = ['user','created','id','updated']
     def validate(self, data):
         if self.instance:
